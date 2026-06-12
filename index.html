@@ -76,39 +76,38 @@
     }
 
     // Inicializar el escáner QR
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    
+    scanner.addListener('scan', function (content) {
+        // content es el texto que lee el QR
+        console.log('Escaneado:', content);
+        
+        // Asumimos que el QR contiene algo como: https://midominio.com?id=EMP001
+        // O simplemente el ID puro: "EMP001"
+        let userId = content;
+        
+        // Si el QR tiene URL, intentamos extraer el parámetro 'id' o 'userId'
+        if (content.includes('?')) {
+            const urlParams = new URLSearchParams(content.split('?')[1]);
+            userId = urlParams.get('id') || urlParams.get('userId') || content;
+        }
+        
+        verificarEmpleado(userId);
+    });
+
+    // Iniciar la cámara trasera automáticamente
     Instascan.Camera.getCameras().then(function (cameras) {
-    if (cameras.length > 0) {
-        // Estrategia 1: Buscar por índice (normalmente la 0 es frontal, la 1 es trasera)
-        let cameraToUse = cameras[0]; // Por defecto la primera
-        
-        // Estrategia 2: Buscar específicamente la trasera por nombre
-        for (let i = 0; i < cameras.length; i++) {
-            const cam = cameras[i];
-            const camName = cam.name.toLowerCase();
-            // En la mayoría de dispositivos, la trasera tiene "back", "rear", "environment" o es el índice 1
-            if (camName.includes('back') || 
-                camName.includes('rear') || 
-                camName.includes('environment') ||
-                camName.includes('cámara trasera')) {
-                cameraToUse = cam;
-                break;
-            }
+        if (cameras.length > 0) {
+            // Prefiere la cámara trasera (environment) si existe
+            const backCamera = cameras.find(cam => cam.name.toLowerCase().includes('back') || cam.name.toLowerCase().includes('environment'));
+            scanner.start(backCamera || cameras[0]);
+        } else {
+            document.getElementById('resultado').innerHTML = 'No se detectó una cámara.';
         }
-        
-        // Estrategia 3: Si el dispositivo tiene 2 o más cámaras, usar la última (suele ser la trasera)
-        if (cameras.length >= 2 && cameraToUse === cameras[0]) {
-            cameraToUse = cameras[cameras.length - 1];
-        }
-        
-        console.log('Usando cámara:', cameraToUse.name);
-        scanner.start(cameraToUse);
-    } else {
-        document.getElementById('resultado').innerHTML = 'No se detectó una cámara.';
-    }
-}).catch(function (e) {
-    console.error(e);
-    document.getElementById('resultado').innerHTML = 'Error al acceder a la cámara. Asegúrate de dar permisos.';
-});
+    }).catch(function (e) {
+        console.error(e);
+        document.getElementById('resultado').innerHTML = 'Error al acceder a la cámara. Asegúrate de dar permisos.';
+    });
 </script>
 </body>
 </html>
