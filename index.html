@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital San Juan - Gestión & Salud</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* VARIABLES Y CONFIGURACIÓN GENERAL */
+        :root {
+            --primary-color: #0c5adb;
+            --secondary-color: #0fd2c4;
+            --dark-color: #1a2530;
+            --light-bg: #f4f7f6;
+            --white: #ffffff;
+            --gray: #6c7a89;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        /* NAVEGACIÓN */
+        .navbar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-emergencia {
+            background-color: var(--danger);
+            color: var(--white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            background: linear-gradient(rgba(12, 90, 219, 0.85), rgba(26, 37, 48, 0.9)), url('https://images.unsplash.com/photo-1586773860418-d3b3de97e66f?q=80&w=1470') no-repeat center center/cover;
+            height: 75vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--white);
+            padding: 0 1rem;
+            margin-top: 60px;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0cb3a7;
+        }
+
+        /* ESPECIALIDADES */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background: var(--light-bg);
+            padding: 2.5rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-med {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* LÓGICA DE FILTRADO INTERACTIVO CON CSS PURO */
+        /* Ocultar los inputs radio de control */
+        .filter-controller {
+            display: none;
+        }
+
+        /* Contenedor de botones de filtro estilizados como Labels */
+        .filter-labels {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            background: none;
+            color: var(--primary-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .filter-btn:hover {
+            background-color: rgba(12, 90, 219, 0.1);
+        }
+
+        /* Efecto de botón activo usando los radios seleccionados */
+        #radio-todos:checked ~ .filter-labels label[for="radio-todos"],
+        #radio-medica:checked ~ .filter-labels label[for="radio-medica"],
+        #radio-terapeutico:checked ~ .filter-labels label[for="radio-terapeutico"],
+        #radio-administrativa:checked ~ .filter-labels label[for="radio-administrativa"] {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Contenedor de Personal */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .staff-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        .staff-card h4 {
+            color: var(--dark-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge-role {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+        }
+
+        .badge-medica { background: #e1f5fe; color: #0288d1; }
+        .badge-terapeutico { background: #e8f5e9; color: #388e3c; }
+        .badge-administrativa { background: #fff3e0; color: #f57c00; }
+
+        /* Reglas de filtrado por CSS: Ocultar/Mostrar según la selección */
+        #radio-medica:checked ~ .staff-grid .staff-card:not(.cat-medica),
+        #radio-terapeutico:checked ~ .staff-grid .staff-card:not(.cat-terapeutico),
+        #radio-administrativa:checked ~ .staff-grid .staff-card:not(.cat-administrativa) {
+            display: none;
+        }
+
+        /* CONTACTO Y FORMULARIO */
+        .contact-section {
+            background-color: var(--light-bg);
+            max-width: 100%;
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 4rem;
+        }
+
+        .contact-info i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-form input, .contact-form select, .contact-form textarea {
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #0a4aba;
+        }
+
+        .main-footer {
+            background: var(--dark-color);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo"><i class="fa-solid fa-hospital-user"></i> Hospital San Juan</a>
+            <ul class="nav-menu">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#especialidades">Especialidades</a></li>
+                <li><a href="#personal">Nuestro Equipo</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+            <button class="btn-emergencia">Emergencias 24/7</button>
+        </div>
+    </nav>
+
+    <section id="inicio" class="hero-section">
+        <div class="hero-content">
+            <h1>Atención Médica y Especializada</h1>
+            <p>Comprometidos con la salud mental, física y el bienestar integral de toda nuestra comunidad.</p>
+            <a href="#contacto" class="btn-primary">Agendar Consulta</a>
+        </div>
+    </section>
+
+    <section id="especialidades" class="services-section">
+        <h2 class="section-title">Nuestras Especialidades Médicas</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fa-solid fa-brain icon-med"></i>
+                <h3>Psiquiatría y Salud Mental</h3>
+                <p>Contamos con un equipo de especialistas dedicados al diagnóstico y tratamiento de la salud mental de manera integral.</p>
+            </div>
+            <div class="service-card">
+                <i class="fa-solid fa-user-doctor icon-med"></i>
+                <h3>Medicina General</h3>
+                <p>Atención primaria continua, prevención de enfermedades y canalización experta a áreas de alta complejidad.</p>
+            </div>
+            <div class="service-card">
+                <i class="fa-solid fa-child icon-med"></i>
+                <h3>Terapia Ocupacional</h3>
+                <p>Programas de rehabilitación física y neurológica adaptados para reintegrar las capacidades del paciente.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="personal" class="staff-section">
+        <h2 class="section-title">Estructura Organizacional del Hospital</h2>
+        <p class="section-subtitle">Usa los botones para filtrar dinámicamente nuestro personal cargado por áreas.</p>
+        
+        <input type="radio" name="filtro-personal" id="radio-todos" class="filter-controller" checked>
+        <input type="radio" name="filtro-personal" id="radio-medica" class="filter-controller">
+        <input type="radio" name="filtro-personal" id="radio-terapeutico" class="filter-controller">
+        <input type="radio" name="filtro-personal" id="radio-administrativa" class="filter-controller">
+
+        <div class="filter-labels">
+            <label for="radio-todos" class="filter-btn">Todos</label>
+            <label for="radio-medica" class="filter-btn">Asistencial / Médica</label>
+            <label for="radio-terapeutico" class="filter-btn">Salud Mental / Apoyo</label>
+            <label for="radio-administrativa" class="filter-btn">Administrativa / Seguros</label>
+        </div>
+
+        <div class="staff-grid">
+            
+            <div class="staff-card cat-medica">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>DR. ENRIQUE JAIRO URUETA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Director Médico</p>
+                <span class="badge-role badge-medica">Asistencial / Médica</span>
+            </div>
+
+            <div class="staff-card cat-medica">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>LIC. EMMA LORENA ARENAS</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Jefe de Enfermería</p>
+                <span class="badge-role badge-medica">Asistencial / Médica</span>
+            </div>
+
+            <div class="staff-card cat-medica">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>DR. MIGUEL ANGEL ALVAREZ</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Médico Psiquiatra</p>
+                <span class="badge-role badge-medica">Asistencial / Médica</span>
+            </div>
+
+            <div class="staff-card cat-medica">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>DR. JOSE LUIS LAURA TUPA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Médico General</p>
+                <span class="badge-role badge-medica">Asistencial / Médica</span>
+            </div>
+
+            <div class="staff-card cat-terapeutico">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>LIC. LUIS ALBERTO MOJICA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Jefe de Psicología</p>
+                <span class="badge-role badge-terapeutico">Salud Mental / Apoyo</span>
+            </div>
+
+            <div class="staff-card cat-terapeutico">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>REINA JAZMIN MALLEA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Terapeuta Ocupacional</p>
+                <span class="badge-role badge-terapeutico">Salud Mental / Apoyo</span>
+            </div>
+
+            <div class="staff-card cat-terapeutico">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>YOBANA JUANA QUISPE</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Trabajadora Social</p>
+                <span class="badge-role badge-terapeutico">Salud Mental / Apoyo</span>
+            </div>
+
+            <div class="staff-card cat-administrativa">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>ERICK CALEB QUISBERT</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Encargado de Sistemas</p>
+                <span class="badge-role badge-administrativa">Administración</span>
+            </div>
+
+            <div class="staff-card cat-administrativa">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>ODON LLANOS ESPINOZA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Contador General</p>
+                <span class="badge-role badge-administrativa">Administración</span>
+            </div>
+
+            <div class="staff-card cat-administrativa">
+                <i class="fa-solid fa-circle-user" style="font-size: 3.5rem; color: #b0bec5; margin-bottom: 1rem;"></i>
+                <h4>JHORDAN FRANCISCO VEIZAGA</h4>
+                <p style="color: #6c7a89; font-size: 0.9rem;">Cajero Principal</p>
+                <span class="badge-role badge-administrativa">Administración</span>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="contacto" class="contact-section">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h2>¿Necesitas ayuda médica?</h2>
+                <p>Escríbenos o visítanos directamente en nuestras instalaciones institucionales.</p>
+                <p><i class="fa-solid fa-location-dot"></i> Av. Principal No. 450, Bolivia</p>
+                <p><i class="fa-solid fa-phone"></i> +591 2 2345678</p>
+                <p><i class="fa-solid fa-envelope"></i> contacto@hospitalsanjuan.bo</p>
+            </div>
+            <form class="contact-form" action="#" method="POST">
+                <input type="text" placeholder="Nombre Completo" required>
+                <input type="email" placeholder="Correo Electrónico" required>
+                <select required>
+                    <option value="" disabled selected>Selecciona la Especialidad</option>
+                    <option value="medicina">Medicina General</option>
+                    <option value="psiquiatria">Psiquiatría</option>
+                    <option value="terapia">Terapia / Psicología</option>
+                </select>
+                <textarea rows="5" placeholder="Escribe tu mensaje o motivo de consulta..." required></textarea>
+                <button type="submit" class="btn-submit">Enviar Solicitud</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 Hospital San Juan. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
