@@ -9,7 +9,7 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background: #f0f2f5; }
         .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        video { width: 100%; max-width: 500px; border-radius: 16px; border: 2px solid #ccc; margin-top: 10px; transform: rotate(180deg);}
+        video { width: 100%; max-width: 500px; border-radius: 16px; border: 2px solid #ccc; margin-top: 10px; }
         .resultado { margin-top: 20px; padding: 20px; border-radius: 16px; font-weight: bold; font-size: 1.8rem; }
         .activo { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .inactivo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
@@ -101,6 +101,13 @@
             // Prefiere la cámara trasera (environment) si existe
             const backCamera = cameras.find(cam => cam.name.toLowerCase().includes('back') || cam.name.toLowerCase().includes('environment'));
             scanner.start(backCamera || cameras[0]);
+                    setTimeout(() => {
+            const videoElement = document.getElementById('preview');
+            if (videoElement) {
+                videoElement.style.transform = 'rotate(0deg)';
+                videoElement.style.webkitTransform = 'rotate(0deg)';
+            }
+        }, 100);
         } else {
             document.getElementById('resultado').innerHTML = 'No se detectó una cámara.';
         }
